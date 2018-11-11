@@ -14,7 +14,7 @@ namespace Homework3_5
         {
             List<int[]> variantBank = GenerateList();
             List<int[]> attemptBank = new List<int[]>();
-            List<int[]> amountBank = new List<int[]>();
+            List<int[]> bullscowsBank = new List<int[]>();
             //List<int[]> varBank = new List<int[]>();
             //varBank.Add(new int[] { 0, 1, 2, 3 });
             //varBank.Add(new int[] { 0, 1, 2, 4 });
@@ -31,16 +31,23 @@ namespace Homework3_5
                 int bulls = Int32.Parse(Console.ReadLine());
                 Console.Write("Коров: ");
                 int cows = Int32.Parse(Console.ReadLine());
-                amountBank.Add(new int[] { bulls, cows });
+                int herd = bulls + cows;
+                bullscowsBank.Add(new int[] { bulls, cows, herd });
                 if (bulls != 4)
                 {
-                    int herd = bulls + cows;
+                    //Simple if
                     if (bulls != 4) variantBank.RemoveAt(0);
                     if (bulls == 0) variantBank = IfNoBulls(variantBank, attemptBank[attemptCount]);
                     if (bulls != 0) variantBank = IfAnyBulls(variantBank, attemptBank[attemptCount]);
                     if (herd == 0) variantBank = IfNoBullsNoCows(variantBank, attemptBank[attemptCount]);
                     if (herd == 4) variantBank = IfFullHerd(variantBank, attemptBank[attemptCount]);
-                    if (herd < (attemptBank[attemptCount][0] + attemptBank[attemptCount][1])) variantBank = IfHerdBecameLess(variantBank, attemptBank[attemptCount], attemptBank[attemptCount - 1]);
+                    //Complex if
+                    for (int i = 0; i < attemptCount; i++)
+                    {
+                        int herdDifference = herd - bullscowsBank[i][2];
+                        if (herdDifference < 0) variantBank = IfHerdDecreased(variantBank, attemptBank[attemptCount], attemptBank[i], herdDifference);
+                        if (herdDifference > 0) variantBank = IfHerdIncreased(variantBank, attemptBank[attemptCount], attemptBank[i], herdDifference);
+                    }
                 }
                 else isGuessed = true;
                 PrintList(variantBank);
@@ -152,15 +159,56 @@ namespace Homework3_5
             return tempList;
         }
 
-        static List<int[]> IfHerdBecameLess(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious)   
+        static List<int[]> IfHerdDecreased(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious, int herdDifference)  //Вроде работает
         {
+            int differenceCount = 0;
+            List<int> foundNums = new List<int>();
             for (int j = 0; j < 4; j++)
             {
-                if (Array.IndexOf(tempElement, tempElementPrevious[j]) != -1)
+                if (Array.IndexOf(tempElement, tempElementPrevious[j]) == -1)
                 {
-                    for (int i = 0; i < tempList.Count; i++)
+                    differenceCount++;
+                    foundNums.Add(tempElementPrevious[j]);
+                }
+            }
+
+            if (differenceCount == Math.Abs(herdDifference))
+            {
+                for (int i = 0; i < tempList.Count; i++)
+                {
+                    for (int j = 0; j < foundNums.Count; j++)
                     {
-                        if (Array.IndexOf(tempList[i], tempElementPrevious[j]) == -1) //Херня пока что
+                        if (Array.IndexOf(tempList[i], foundNums[j]) == -1)
+                        {
+                            tempList.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+            }
+            return tempList;
+        }
+
+        static List<int[]> IfHerdIncreased(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious, int herdDifference)  //Вроде работает
+        {
+            int differenceCount = 0;
+            List<int> foundNums = new List<int>();
+            for (int j = 0; j < 4; j++)
+            {
+                if (Array.IndexOf(tempElementPrevious, tempElement[j]) == -1)
+                {
+                    differenceCount++;
+                    foundNums.Add(tempElement[j]);
+                }
+            }
+
+            if (differenceCount == herdDifference)
+            {
+                for (int i = 0; i < tempList.Count; i++)
+                {
+                    for (int j = 0; j < foundNums.Count; j++)
+                    {
+                        if (Array.IndexOf(tempList[i], foundNums[j]) == -1)
                         {
                             tempList.RemoveAt(i);
                             i--;
