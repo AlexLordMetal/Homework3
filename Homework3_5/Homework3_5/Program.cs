@@ -21,11 +21,15 @@ namespace Homework3_5
             //varBank.Add(new int[] { 5, 7, 2, 8 });
             //varBank.Add(new int[] { 5, 6, 7, 8 });
 
+            int attemptCount = 0;
             bool isGuessed = false;
             while (isGuessed != true)
             {
-                attemptBank.Add(variantBank[0]);
-                int attemptCount = attemptBank.Count - 1;
+                Random rnd = new Random();
+                int randomNum = rnd.Next(variantBank.Count);
+                attemptBank.Add(variantBank[randomNum]);
+                //attemptBank.Add(variantBank[0]);
+                attemptCount = attemptBank.Count - 1;
                 Console.WriteLine($"Осталось {variantBank.Count}, число {ElementToString(attemptBank[attemptCount])}");
                 Console.Write("Быков: ");
                 int bulls = Int32.Parse(Console.ReadLine());
@@ -36,7 +40,7 @@ namespace Homework3_5
                 if (bulls != 4)
                 {
                     //Simple if
-                    if (bulls != 4) variantBank.RemoveAt(0);
+                    if (bulls != 4) variantBank.RemoveAt(randomNum);
                     if (bulls == 0) variantBank = IfNoBulls(variantBank, attemptBank[attemptCount]);
                     if (bulls != 0) variantBank = IfAnyBulls(variantBank, attemptBank[attemptCount]);
                     if (herd == 0) variantBank = IfNoBullsNoCows(variantBank, attemptBank[attemptCount]);
@@ -50,16 +54,9 @@ namespace Homework3_5
                     }
                 }
                 else isGuessed = true;
-                PrintList(variantBank);
+                //PrintList(variantBank);
             }
-
-
-
-
-
-
-
-
+            Console.WriteLine($"Ваше число {ElementToString(attemptBank[attemptCount])} угадано c {attemptCount} попытки!");
             Console.ReadKey();
         }
 
@@ -174,9 +171,9 @@ namespace Homework3_5
 
             if (differenceCount == Math.Abs(herdDifference))
             {
-                for (int i = 0; i < tempList.Count; i++)
+                for (int j = 0; j < foundNums.Count; j++)
                 {
-                    for (int j = 0; j < foundNums.Count; j++)
+                    for (int i = 0; i < tempList.Count; i++)
                     {
                         if (Array.IndexOf(tempList[i], foundNums[j]) == -1)
                         {
@@ -204,9 +201,9 @@ namespace Homework3_5
 
             if (differenceCount == herdDifference)
             {
-                for (int i = 0; i < tempList.Count; i++)
+                for (int j = 0; j < foundNums.Count; j++)
                 {
-                    for (int j = 0; j < foundNums.Count; j++)
+                    for (int i = 0; i < tempList.Count; i++)
                     {
                         if (Array.IndexOf(tempList[i], foundNums[j]) == -1)
                         {
