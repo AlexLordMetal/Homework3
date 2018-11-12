@@ -41,9 +41,11 @@ namespace Homework3_5
                 else                                                                        //Normal condition for third and further attempts
                 {
                     attemptBank.Add(variantBank[rnd.Next(variantBank.Count)]);
+                    //attemptBank.Add(variantBank[0]);
                     attemptCount++;
                 }
 
+                Console.Title = "Быки и коровы v.0.13";
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine($"{{Осталось {variantBank.Count} вариантов}} ");
                 Console.ForegroundColor = ConsoleColor.White;
@@ -343,7 +345,7 @@ namespace Homework3_5
             return tempList;
         }
 
-        static List<int[]> IfHerdTwoInTwoSteps(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious)  //Пока не
+        static List<int[]> IfHerdTwoInTwoSteps(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious)  //Вроде работает
         {
             List<int> foundNums = new List<int>();
             for (int j = 0; j < 10; j++)
