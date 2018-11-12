@@ -33,7 +33,7 @@ namespace Homework3_5
                 else if (attemptBank.Count == 2 && attemptCount == 0)                       //Special condition for second attempt
                     if (bullscowsBank[0][2] == 4)
                     {
-                        attemptBank.RemoveAt(attemptBank.Count - 1);                        //Remove because on first attempt we find all numbers
+                        attemptBank.RemoveAt(attemptBank.Count - 1);                        //Remove because on first attempt we finded all numbers
                         attemptBank.Add(variantBank[rnd.Next(variantBank.Count)]);
                         attemptCount++;
                     }
