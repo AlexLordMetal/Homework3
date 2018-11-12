@@ -12,11 +12,6 @@ namespace Homework3_5
             List<int[]> variantBank = GenerateList();
             List<int[]> attemptBank = new List<int[]>();
             List<int[]> bullscowsBank = new List<int[]>();
-            //List<int[]> varBank = new List<int[]>();
-            //varBank.Add(new int[] { 0, 1, 2, 3 });
-            //varBank.Add(new int[] { 0, 1, 2, 4 });
-            //varBank.Add(new int[] { 5, 7, 2, 8 });
-            //varBank.Add(new int[] { 5, 6, 7, 8 });
 
             int attemptCount = 0;
             bool isGuessed = false;
@@ -59,13 +54,10 @@ namespace Homework3_5
                 bullscowsBank.Add(new int[] { bulls, cows, herd });
                 if (bulls != 4)
                 {
-                    //Simple if
-                    if (bulls != 4) variantBank.Remove(attemptBank[attemptCount]);
-                    if (bulls == 0) variantBank = IfNoBulls(variantBank, attemptBank[attemptCount]);
-                    if (bulls != 0) variantBank = IfAnyBulls(variantBank, attemptBank[attemptCount]);
-                    if (herd == 0) variantBank = IfNoBullsNoCows(variantBank, attemptBank[attemptCount]);
-                    if (herd == 4) variantBank = IfFullHerd(variantBank, attemptBank[attemptCount]);
-                    if (herd > 0 && herd < 4) variantBank = IfNotFullHerd(variantBank, attemptBank[attemptCount]);
+                    //all time
+                    variantBank.Remove(attemptBank[attemptCount]);
+                    variantBank = IfAnyBulls(variantBank, attemptBank[attemptCount], bulls);
+                    variantBank = IfAnyHerd(variantBank, attemptBank[attemptCount], herd);
                     //Complex if
                     for (int i = 0; i < attemptCount; i++)
                     {
@@ -142,28 +134,19 @@ namespace Homework3_5
             return attemptElement;
         }
 
-        static List<int[]> IfNoBulls(List<int[]> tempList, int[] tempElement)           //Вроде работает
+        static List<int[]> IfAnyBulls(List<int[]> tempList, int[] tempElement, int bulls)      //Работает
         {
             for (int i = 0; i < tempList.Count; i++)
             {
-                for (int j = 0; j < 4; j++)
+                int bullsCount = 0;
+                for (int j = 0; j < tempElement.Length; j++)
                 {
                     if (Array.IndexOf(tempList[i], tempElement[j]) == j)
                     {
-                        tempList.RemoveAt(i);
-                        i--;
-                        j = 4;
+                        bullsCount++;
                     }
                 }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfAnyBulls(List<int[]> tempList, int[] tempElement)      //Работает как надо!!!
-        {
-            for (int i = 0; i < tempList.Count; i++)
-            {
-                if ((Array.IndexOf(tempList[i], tempElement[0]) != 0) && (Array.IndexOf(tempList[i], tempElement[1]) != 1) && (Array.IndexOf(tempList[i], tempElement[2]) != 2) && (Array.IndexOf(tempList[i], tempElement[3]) != 3))
+                if (bulls != bullsCount)
                 {
                     tempList.RemoveAt(i);
                     i--;
@@ -172,41 +155,19 @@ namespace Homework3_5
             return tempList;
         }
 
-        static List<int[]> IfNoBullsNoCows(List<int[]> tempList, int[] tempElement)         //Работает как надо
+        static List<int[]> IfAnyHerd(List<int[]> tempList, int[] tempElement, int herd)         //Вроде работает
         {
             for (int i = 0; i < tempList.Count; i++)
             {
+                int herdCount = 0;
                 for (int j = 0; j < 4; j++)
                 {
                     if (Array.IndexOf(tempList[i], tempElement[j]) != -1)
                     {
-                        tempList.RemoveAt(i);
-                        i--;
-                        j = 4;
+                        herdCount++;
                     }
                 }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfFullHerd(List<int[]> tempList, int[] tempElement)          //Вроде работает     
-        {
-            for (int i = 0; i < tempList.Count; i++)
-            {
-                if ((Array.IndexOf(tempList[i], tempElement[0]) == -1) || (Array.IndexOf(tempList[i], tempElement[1]) == -1) || (Array.IndexOf(tempList[i], tempElement[2]) == -1) || (Array.IndexOf(tempList[i], tempElement[3]) == -1))
-                {
-                    tempList.RemoveAt(i);
-                    i--;
-                }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfNotFullHerd(List<int[]> tempList, int[] tempElement)          //Вроде работает     
-        {
-            for (int i = 0; i < tempList.Count; i++)
-            {
-                if ((Array.IndexOf(tempList[i], tempElement[0]) == -1) && (Array.IndexOf(tempList[i], tempElement[1]) == -1) && (Array.IndexOf(tempList[i], tempElement[2]) == -1) && (Array.IndexOf(tempList[i], tempElement[3]) == -1))
+                if (herd != herdCount)
                 {
                     tempList.RemoveAt(i);
                     i--;
