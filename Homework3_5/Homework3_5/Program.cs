@@ -9,9 +9,9 @@ namespace Homework3_5
     {
         static void Main(string[] args)
         {
-            List<int[]> variantBank = GenerateList();
-            List<int[]> attemptBank = new List<int[]>();
-            List<int[]> bullscowsBank = new List<int[]>();
+            List<int[]> variantBank = GenerateList();           //List of variant numbers
+            List<int[]> attemptBank = new List<int[]>();        //List of attempt numbers
+            List<int[]> bullscowsBank = new List<int[]>();      //List of bulls, cows, herd (bulls + cows) for each attempt
 
             int attemptCount = 0;
             bool isGuessed = false;
@@ -48,9 +48,9 @@ namespace Homework3_5
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine($"Число {ElementToString(attemptBank[attemptCount])}");
                 Console.Write("Быков: ");
-                int bulls = Int32.Parse(Console.ReadLine());
+                int bulls = ConsoleReadToInt();
                 Console.Write("Коров: ");
-                int cows = Int32.Parse(Console.ReadLine());
+                int cows = ConsoleReadToInt(bulls);
                 Console.WriteLine();
 
                 int herd = bulls + cows;
@@ -60,10 +60,18 @@ namespace Homework3_5
                 {
                     variantBank.Remove(attemptBank[attemptCount]);
                     variantBank = RemoveIncorrect(variantBank, attemptBank[attemptCount], bulls, herd);
+
+                    if (variantBank.Count == 0)                 //If user made a mistake somewhere
+                    {
+                        Console.WriteLine("Вы где-то допустили ошибку! Числа с такими условиями не существует.");
+                        Console.ReadKey();
+                        Environment.Exit(0);
+                    }
+
                 }
                 else isGuessed = true;
 
-                PrintList(variantBank);           //For debugging
+                //PrintList(variantBank);           //For debugging
             }
 
             Console.WriteLine($"Ваше число {ElementToString(attemptBank[attemptCount])} угадано c {attemptCount + 1} попытки!");
@@ -106,6 +114,30 @@ namespace Homework3_5
                 isCorrect = false;
             }
             return isCorrect;
+        }
+
+        /// <summary>
+        /// Reads the number of bulls or cows from the keyboard and checks if it correct.
+        /// </summary>
+        /// <param name="correctionNum">By default - 0 - If method reads the number of bulls. Number of bulls - if method reads the number of cows</param>
+        /// <returns></returns>
+        static int ConsoleReadToInt(int correctionNum=0)
+        {
+            var isCorrectRead = false;
+            int BullsOrCows = -1;
+            while (isCorrectRead != true)
+            {
+                isCorrectRead = Int32.TryParse(Console.ReadLine(), out BullsOrCows);
+                if (isCorrectRead == true && (BullsOrCows < 0 || (BullsOrCows + correctionNum) > 4))
+                {
+                    isCorrectRead = false;
+                }
+                if (isCorrectRead == false)
+                {
+                    Console.Write("Еще раз, сколько? ");
+                }
+            }
+            return BullsOrCows;
         }
 
         /// <summary>
