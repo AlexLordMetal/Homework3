@@ -73,10 +73,11 @@ namespace Homework3_5
                 }
             }
 
-            Console.WriteLine($"Всего сыграно {NumberOfGames} игр.");
+            Console.Clear();
+            Console.WriteLine($"Всего сыграно {NumberOfGames} игр.\n");
             PrintToFile(answerList, iterationArray);
             IterationsCounter(iterationArray);
-            Console.WriteLine("Подробнее в открывшемся файле.");
+            Console.WriteLine("\nПодробнее в открывшемся файле.");
             Console.ReadKey();
         }
 
