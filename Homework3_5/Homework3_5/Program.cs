@@ -12,36 +12,33 @@ namespace Homework3_5
             List<int[]> variantBank = GenerateList();
             List<int[]> attemptBank = new List<int[]>();
             List<int[]> bullscowsBank = new List<int[]>();
-            //List<int[]> varBank = new List<int[]>();
-            //varBank.Add(new int[] { 0, 1, 2, 3 });
-            //varBank.Add(new int[] { 0, 1, 2, 4 });
-            //varBank.Add(new int[] { 5, 7, 2, 8 });
-            //varBank.Add(new int[] { 5, 6, 7, 8 });
 
             int attemptCount = 0;
             bool isGuessed = false;
+
             while (isGuessed != true)
             {
                 Random rnd = new Random();
 
-                if (attemptBank.Count == 0)                                                 //Special condition for first attempt     
+                if (attemptBank.Count == 0)                                                 //Special condition for the first attempt     
                 {
                     attemptBank.Add(variantBank[rnd.Next(variantBank.Count)]);
-                    attemptBank.Add(SecondTry(variantBank, attemptBank[0]));                //Create on first step because this variant may be exclude before second attempt
+                    attemptBank.Add(SecondTry(variantBank, attemptBank[0]));                //Creates on the first attempt because this variant may be exclude before the second attempt
                     attemptCount = 0;
                 }
-                else if (attemptBank.Count == 2 && attemptCount == 0)                       //Special condition for second attempt
+
+                else if (attemptBank.Count == 2 && attemptCount == 0)                       //Special condition for the second attempt
                     if (bullscowsBank[0][2] == 4)
                     {
-                        attemptBank.RemoveAt(attemptBank.Count - 1);                        //Remove because on first attempt we finded all numbers
+                        attemptBank.RemoveAt(attemptBank.Count - 1);                        //Removes incorrect second attempt because on the first attempt were found all numbers
                         attemptBank.Add(variantBank[rnd.Next(variantBank.Count)]);
                         attemptCount++;
                     }
                     else attemptCount++;
+
                 else                                                                        //Normal condition for third and further attempts
                 {
                     attemptBank.Add(variantBank[rnd.Next(variantBank.Count)]);
-                    //attemptBank.Add(variantBank[0]);
                     attemptCount++;
                 }
 
@@ -55,40 +52,31 @@ namespace Homework3_5
                 Console.Write("Коров: ");
                 int cows = Int32.Parse(Console.ReadLine());
                 Console.WriteLine();
+
                 int herd = bulls + cows;
                 bullscowsBank.Add(new int[] { bulls, cows, herd });
+
                 if (bulls != 4)
                 {
-                    //Simple if
-                    if (bulls != 4) variantBank.Remove(attemptBank[attemptCount]);
-                    if (bulls == 0) variantBank = IfNoBulls(variantBank, attemptBank[attemptCount]);
-                    if (bulls != 0) variantBank = IfAnyBulls(variantBank, attemptBank[attemptCount]);
-                    if (herd == 0) variantBank = IfNoBullsNoCows(variantBank, attemptBank[attemptCount]);
-                    if (herd == 4) variantBank = IfFullHerd(variantBank, attemptBank[attemptCount]);
-                    if (herd > 0 && herd < 4) variantBank = IfNotFullHerd(variantBank, attemptBank[attemptCount]);
-                    //Complex if
-                    for (int i = 0; i < attemptCount; i++)
-                    {
-                        int bullsDifference = bulls - bullscowsBank[i][0];
-                        int herdDifference = herd - bullscowsBank[i][2];
-                        int herdSum = herd + bullscowsBank[i][2];
-                        if (bullsDifference < 0 && cows == 0) variantBank = IfBullsDecreased(variantBank, attemptBank[attemptCount], attemptBank[i], bullsDifference);
-                        if (herdDifference < 0) variantBank = IfHerdDecreased(variantBank, attemptBank[attemptCount], attemptBank[i], herdDifference);
-                        if (herdDifference > 0) variantBank = IfHerdIncreased(variantBank, attemptBank[attemptCount], attemptBank[i], herdDifference);
-                        if (herdSum == 4) variantBank = IfHerdFullInTwoSteps(variantBank, attemptBank[attemptCount], attemptBank[i]);
-                        if (herdSum == 2) variantBank = IfHerdTwoInTwoSteps(variantBank, attemptBank[attemptCount], attemptBank[i]);
-                    }
+                    variantBank.Remove(attemptBank[attemptCount]);
+                    variantBank = RemoveIncorrect(variantBank, attemptBank[attemptCount], bulls, herd);
                 }
                 else isGuessed = true;
-                //PrintList(variantBank);
+
+                PrintList(variantBank);           //For debugging
             }
+
             Console.WriteLine($"Ваше число {ElementToString(attemptBank[attemptCount])} угадано c {attemptCount + 1} попытки!");
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Generates all possible attempts of four-digit numbers with non-repeating numerics.
+        /// </summary>
+        /// <returns></returns>
         static List<int[]> GenerateList()
         {
-            List<int[]> numList = new List<int[]>();
+            List<int[]> tempList = new List<int[]>();
             for (int i = 0; i < 10; i++)
                 for (int j = 0; j < 10; j++)
                     for (int k = 0; k < 10; k++)
@@ -96,12 +84,20 @@ namespace Homework3_5
                         {
                             if (IsCorrect(i, j, k, l) == true)
                             {
-                                numList.Add(new int[] { i, j, k, l });
+                                tempList.Add(new int[] { i, j, k, l });
                             }
                         }
-            return numList;
+            return tempList;
         }
 
+        /// <summary>
+        /// Cheks if the numerics are not repeat.
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <param name="k"></param>
+        /// <param name="l"></param>
+        /// <returns></returns>
         static bool IsCorrect(int i, int j, int k, int l)
         {
             bool isCorrect = true;
@@ -112,25 +108,21 @@ namespace Homework3_5
             return isCorrect;
         }
 
-        static string ElementToString(int[] elementArray)
-        {
-            string elementString = null;
-            foreach (var i in elementArray)
-            {
-                elementString += i;
-            }
-            return elementString;
-        }
-
-        static int[] SecondTry(List<int[]> variantBank, int[] attemptElementPrevious)
+        /// <summary>
+        /// Chooses the random number with numerics different from the previous (first) attempt.
+        /// </summary>
+        /// <param name="tempList">All possible answer variants.</param>
+        /// <param name="attemptElementPrevious">Previous answer attempt.</param>
+        /// <returns></returns>
+        static int[] SecondTry(List<int[]> tempList, int[] attemptElementPrevious)
         {
             Random rnd1 = new Random();
             bool isNotEqual = false;
-            int[] attemptElement = variantBank[0];
+            int[] attemptElement = tempList[0];
             while (isNotEqual != true)
             {
                 isNotEqual = true;
-                attemptElement = variantBank[rnd1.Next(variantBank.Count)];
+                attemptElement = tempList[rnd1.Next(tempList.Count)];
                 for (int i = 0; i < 4; i++)
                 {
                     if (Array.IndexOf(attemptElementPrevious, attemptElement[i]) != -1)
@@ -142,250 +134,75 @@ namespace Homework3_5
             return attemptElement;
         }
 
-        static List<int[]> IfNoBulls(List<int[]> tempList, int[] tempElement)           //Вроде работает
+        /// <summary>
+        /// Convert the attempt number from array of int to string.
+        /// </summary>
+        /// <param name="elementArray"></param>
+        /// <returns></returns>
+        static string ElementToString(int[] elementArray)
         {
-            for (int i = 0; i < tempList.Count; i++)
+            string elementString = null;
+            foreach (var i in elementArray)
             {
-                for (int j = 0; j < 4; j++)
-                {
-                    if (Array.IndexOf(tempList[i], tempElement[j]) == j)
-                    {
-                        tempList.RemoveAt(i);
-                        i--;
-                        j = 4;
-                    }
-                }
+                elementString += i;
             }
-            return tempList;
+            return elementString;
         }
 
-        static List<int[]> IfAnyBulls(List<int[]> tempList, int[] tempElement)      //Работает как надо!!!
-        {
-            for (int i = 0; i < tempList.Count; i++)
-            {
-                if ((Array.IndexOf(tempList[i], tempElement[0]) != 0) && (Array.IndexOf(tempList[i], tempElement[1]) != 1) && (Array.IndexOf(tempList[i], tempElement[2]) != 2) && (Array.IndexOf(tempList[i], tempElement[3]) != 3))
-                {
-                    tempList.RemoveAt(i);
-                    i--;
-                }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfNoBullsNoCows(List<int[]> tempList, int[] tempElement)         //Работает как надо
-        {
-            for (int i = 0; i < tempList.Count; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    if (Array.IndexOf(tempList[i], tempElement[j]) != -1)
-                    {
-                        tempList.RemoveAt(i);
-                        i--;
-                        j = 4;
-                    }
-                }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfFullHerd(List<int[]> tempList, int[] tempElement)          //Вроде работает     
-        {
-            for (int i = 0; i < tempList.Count; i++)
-            {
-                if ((Array.IndexOf(tempList[i], tempElement[0]) == -1) || (Array.IndexOf(tempList[i], tempElement[1]) == -1) || (Array.IndexOf(tempList[i], tempElement[2]) == -1) || (Array.IndexOf(tempList[i], tempElement[3]) == -1))
-                {
-                    tempList.RemoveAt(i);
-                    i--;
-                }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfNotFullHerd(List<int[]> tempList, int[] tempElement)          //Вроде работает     
-        {
-            for (int i = 0; i < tempList.Count; i++)
-            {
-                if ((Array.IndexOf(tempList[i], tempElement[0]) == -1) && (Array.IndexOf(tempList[i], tempElement[1]) == -1) && (Array.IndexOf(tempList[i], tempElement[2]) == -1) && (Array.IndexOf(tempList[i], tempElement[3]) == -1))
-                {
-                    tempList.RemoveAt(i);
-                    i--;
-                }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfBullsDecreased(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious, int bullsDifference)  //Вроде работает
-        {
-            int differenceCount = 0;
-            List<int[]> foundNums = new List<int[]>();
-            for (int j = 0; j < 4; j++)
-            {
-                if (Array.IndexOf(tempElement, tempElementPrevious[j]) == -1)
-                {
-                    differenceCount++;
-                    foundNums.Add(new int[] { j, tempElementPrevious[j], tempElement[j] });
-                }
-            }
-
-            if (differenceCount == Math.Abs(bullsDifference))
-            {
-                for (int j = 0; j < foundNums.Count; j++)
-                {
-                    for (int i = 0; i < tempList.Count; i++)
-                    {
-                        if (Array.IndexOf(tempList[i], foundNums[j][1]) != foundNums[j][0])
-                        {
-                            tempList.RemoveAt(i);
-                            i--;
-                        }
-                        else if (Array.IndexOf(tempList[i], foundNums[j][2]) != -1)
-                        {
-                            tempList.RemoveAt(i);
-                            i--;
-                        }
-                    }
-                }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfHerdDecreased(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious, int herdDifference)  //Вроде работает
-        {
-            int differenceCount = 0;
-            List<int> foundNums = new List<int>();
-            for (int j = 0; j < 4; j++)
-            {
-                if (Array.IndexOf(tempElement, tempElementPrevious[j]) == -1)
-                {
-                    differenceCount++;
-                    foundNums.Add(tempElementPrevious[j]);
-                }
-            }
-
-            if (differenceCount == Math.Abs(herdDifference))
-            {
-                for (int j = 0; j < foundNums.Count; j++)
-                {
-                    for (int i = 0; i < tempList.Count; i++)
-                    {
-                        if (Array.IndexOf(tempList[i], foundNums[j]) == -1)
-                        {
-                            tempList.RemoveAt(i);
-                            i--;
-                        }
-                    }
-                }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfHerdIncreased(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious, int herdDifference)  //Вроде работает
-        {
-            int differenceCount = 0;
-            List<int> foundNums = new List<int>();
-            for (int j = 0; j < 4; j++)
-            {
-                if (Array.IndexOf(tempElementPrevious, tempElement[j]) == -1)
-                {
-                    differenceCount++;
-                    foundNums.Add(tempElement[j]);
-                }
-            }
-
-            if (differenceCount == herdDifference)
-            {
-                for (int j = 0; j < foundNums.Count; j++)
-                {
-                    for (int i = 0; i < tempList.Count; i++)
-                    {
-                        if (Array.IndexOf(tempList[i], foundNums[j]) == -1)
-                        {
-                            tempList.RemoveAt(i);
-                            i--;
-                        }
-                    }
-                }
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfHerdFullInTwoSteps(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious)  //Вроде работает
-        {
-            List<int> foundNums = new List<int>();
-            for (int j = 0; j < 4; j++)
-            {
-                foundNums.Add(tempElement[j]);
-                if (Array.IndexOf(tempElement, tempElementPrevious[j]) == -1)
-                {
-                    foundNums.Add(tempElementPrevious[j]);
-                }
-            }
-
-            if (foundNums.Count == 8)
-            {
-                for (int i = 0; i < tempList.Count; i++)
-                {
-                    int CountNums = 0;
-                    for (int j = 0; j < foundNums.Count; j++)
-                    {
-                        if (Array.IndexOf(tempList[i], foundNums[j]) != -1)
-                        {
-                            CountNums++;
-                        }
-                    }
-                    if (CountNums < 4)
-                    {
-                        tempList.RemoveAt(i);
-                        i--;
-                    }
-                }
-
-            }
-            return tempList;
-        }
-
-        static List<int[]> IfHerdTwoInTwoSteps(List<int[]> tempList, int[] tempElement, int[] tempElementPrevious)  //Вроде работает
-        {
-            List<int> foundNums = new List<int>();
-            for (int j = 0; j < 10; j++)
-            {
-                if (Array.IndexOf(tempElement, j) == -1 && Array.IndexOf(tempElementPrevious, j) == -1)
-                {
-                    foundNums.Add(j);
-                }
-            }
-
-            if (foundNums.Count == 2)
-            {
-                for (int i = 0; i < tempList.Count; i++)
-                {
-                    if (Array.IndexOf(tempList[i], foundNums[0]) == -1 || Array.IndexOf(tempList[i], foundNums[1]) == -1)
-                    {
-                        tempList.RemoveAt(i);
-                        i--;
-                    }
-                }
-
-            }
-            return tempList;
-        }
-
-        static void PrintList(List<int[]> tempList)             //Работает как надо!!!
+        /// <summary>
+        /// Write List of arrays of int to txt file and open it.
+        /// </summary>
+        /// <param name="tempList">All possible answer variants.</param>
+        static void PrintList(List<int[]> tempList)
         {
             StreamWriter write = new StreamWriter("List.txt");
             foreach (int[] i in tempList)
             {
-                foreach (int j in i)
-                {
-                    write.Write(j);
-                }
-                write.WriteLine();
+                write.WriteLine(ElementToString(i));
             }
             write.Close();
             Process.Start("List.txt");
         }
 
+        /// <summary>
+        /// Removes the answer variants, which do not fit the current attempt.
+        /// </summary>
+        /// <param name="tempList">All possible answer variants.</param>
+        /// <param name="attemptElement">Current answer attempt.</param>
+        /// <param name="bulls">Number of bulls in current answer attempt.</param>
+        /// <param name="herd">Herd number (bulls and cows together) in current answer attempt.</param>
+        /// <returns></returns>
+        static List<int[]> RemoveIncorrect(List<int[]> tempList, int[] attemptElement, int bulls, int herd)
+        {
+            for (int i = 0; i < tempList.Count; i++)
+            {
+                int bullsCount = 0;
+                int herdCount = 0;
+                for (int j = 0; j < attemptElement.Length; j++)
+                {
+                    if (Array.IndexOf(tempList[i], attemptElement[j]) == j)
+                    {
+                        bullsCount++;
+                    }
+                    if (Array.IndexOf(tempList[i], attemptElement[j]) != -1)
+                    {
+                        herdCount++;
+                    }
+                }
+
+                if (bulls != bullsCount)        //If the number of bulls in current element is not equal to the number of bulls in attempt element, removes this element
+                {
+                    tempList.RemoveAt(i);
+                    i--;
+                }
+                else if (herd != herdCount)     //If the herd number (of bulls and cows together) in current element is not equal to the herd number in attempt element, removes this element
+                {
+                    tempList.RemoveAt(i);
+                    i--;
+                }
+            }
+            return tempList;
+        }
 
     }
 }
